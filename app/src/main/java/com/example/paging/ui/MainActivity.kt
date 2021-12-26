@@ -1,6 +1,7 @@
 package com.example.paging.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.paging.databinding.ActivityMainBinding
@@ -21,16 +22,27 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setupRecycler()
         setupViewModel()
+        setupListeners()
+    }
+
+    private fun setupListeners() {
+        binding.swipeRefresh.setOnRefreshListener {
+            adapter.refresh()
+        }
     }
 
     private fun setupRecycler() {
         binding.recycler.adapter = adapter
+        binding.recycler.adapter = adapter.withLoadStateFooter(
+            footer = RedditStateAdapter { adapter.retry() }
+        )
     }
 
     private fun setupViewModel() {
         lifecycleScope.launch {
             viewModel.loadPosts().collectLatest {
                 adapter.submitData(it)
+                binding.swipeRefresh.isRefreshing = false
             }
         }
     }

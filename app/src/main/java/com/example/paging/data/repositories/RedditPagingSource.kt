@@ -15,12 +15,11 @@ class RedditPagingSource(private val service: RedditService) : PagingSource<Stri
 
     override suspend fun load(params: LoadParams<String>): LoadResult<String, RedditPost> {
         return try {
-            val response = service.fetchPosts(loadSize = params.loadSize)
+            val response = service.fetchPosts(loadSize = params.loadSize, after = params.key)
             val listing = response.body()?.data
             val posts = listing?.children?.map { it.data }
 
             LoadResult.Page(posts ?: emptyList(), listing?.before, listing?.after)
-
         } catch (e: IOException) {
             return LoadResult.Error(e)
         } catch (e: HttpException) {

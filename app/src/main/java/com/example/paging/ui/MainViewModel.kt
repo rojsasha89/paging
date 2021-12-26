@@ -15,7 +15,7 @@ class MainViewModel(private val service: RedditService) : ViewModel() {
 
     fun loadPosts(): Flow<PagingData<RedditPost>> {
         return Pager(
-            PagingConfig(pageSize = 20, prefetchDistance = 5),
+            PagingConfig(pageSize = 10, prefetchDistance = 5),
             pagingSourceFactory = { RedditPagingSource(service) }).flow.cachedIn(viewModelScope)
     }
 }
